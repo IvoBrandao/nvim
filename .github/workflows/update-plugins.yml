@@ -1,0 +1,50 @@
+name: Monthly Plugin Update
+
+on:
+  schedule:
+    # Run once per month (day 1 at 03:00 UTC)
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+
+jobs:
+  update-plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y neovim git
+
+      - name: Run update script (updates plugins, modifies lockfile)
+        run: bash ./scripts/update-plugins.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git config --global user.email "actions@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          if git status --porcelain | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update plugins (automated)"
+          branch: automated/plugin-updates-${{ github.run_id }}
+          title: Automated plugin updates
+          body: |
+            This PR was created automatically by GitHub Actions to update lazy.nvim plugins and lockfile.
+          base: master
+          labels: automated,dependencies
