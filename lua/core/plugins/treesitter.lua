@@ -13,7 +13,13 @@ return {
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
     config = function()
-      require('nvim-treesitter.configs').setup({
+      local ok, ts_configs = pcall(require, 'nvim-treesitter.configs')
+      if not ok or not ts_configs then
+        vim.notify('nvim-treesitter not installed; skipping treesitter setup', vim.log.levels.WARN)
+        return
+      end
+
+      ts_configs.setup({
         -- Languages to automatically install
         ensure_installed = {
           'bash',
