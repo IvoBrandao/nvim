@@ -1,6 +1,6 @@
-# Modern Neovim Configuration
+# Neovim Configuration
 
-A comprehensive, modular Neovim configuration designed for professional multi-language development with VSCode-like features.
+A modular Neovim configuration designed for multi-language development with VSCode-like features.
 
 ![alt text](image.png)
 
