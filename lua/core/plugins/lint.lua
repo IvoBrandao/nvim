@@ -31,8 +31,8 @@ return {
         -- YAML linting
         yaml = { 'yamllint' },
 
-        -- JSON linting
-        json = { 'jsonlint' },
+        -- JSON linting (removed - LSP provides validation)
+        -- json = { 'jsonlint' },
 
         -- Dockerfile linting
         dockerfile = { 'hadolint' },
